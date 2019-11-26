@@ -11,6 +11,7 @@ OptionParser.new do |opts|
   opts.banner = "Usage: bookletizer.rb [options]"
 
   opts.on("-f", "--filename FILE", "Source PDF filename") { |v| options[:filename] = v }
+  opts.on("-o", "--output-dir DIR", "Output directory for PDF booklet") { |v| options[:output_dir] = v }
   opts.on("-l", "--letter-size", "Specify paper size as US letter (default A4)") { options[:letter_size] = true }
 
 end.parse!
@@ -39,5 +40,13 @@ out_filename = "output/" + book_name
 
 File.rename("tmp_blanks-book.pdf", out_filename)
 File.delete(blanks)
+
+if options[:output_dir]
+  absolute_path = File.absolute_path(options[:output_dir]) + "/"
+  if !Dir.exist?(absolute_path)
+    abort("  Specified output directory does not exist.")
+  end
+  FileUtils.mv(out_filename, absolute_path)
+end
 
 puts "  Created booklet #{book_name}"
